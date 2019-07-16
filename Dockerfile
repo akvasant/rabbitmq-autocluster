@@ -1,4 +1,4 @@
-FROM alpine:3.6
+FROM ubuntu:18.04
 
 # Version of RabbitMQ to install
 ENV RABBITMQ_VERSION=3.6.14 \
@@ -6,35 +6,34 @@ ENV RABBITMQ_VERSION=3.6.14 \
     AUTOCLUSTER_VERSION=0.10.0 \
     HOME=/var/lib/rabbitmq \
     PATH=/usr/lib/rabbitmq/sbin:$PATH \
-    RABBITMQ_LOGS=- \
-    RABBITMQ_SASL_LOGS=- \
+    RABBITMQ_LOG_BASE=/var/log/rabbitmq \
     RABBITMQ_DIST_PORT=25672 \
     RABBITMQ_SERVER_ERL_ARGS="+K true +A128 +P 1048576 -kernel inet_default_connect_options [{nodelay,true}]" \
     RABBITMQ_MNESIA_DIR=/var/lib/rabbitmq/mnesia \
     RABBITMQ_PID_FILE=/var/lib/rabbitmq/rabbitmq.pid \
     RABBITMQ_PLUGINS_DIR=/usr/lib/rabbitmq/plugins \
     RABBITMQ_PLUGINS_EXPAND_DIR=/var/lib/rabbitmq/plugins \
-    LANG=en_US.UTF-8
-
+    LANGUAGE=en_US.UTF-8
+ARG DEBIAN_FRONTEND=noninteractive
 RUN \
-  apk --update add \
-    coreutils curl xz "su-exec>=0.2" \
-    erlang erlang-asn1 erlang-crypto erlang-eldap erlang-erts erlang-inets erlang-mnesia \
-    erlang-os-mon erlang-public-key erlang-sasl erlang-ssl erlang-syntax-tools erlang-xmerl && \
+  apt-get update -y && \
+  apt-get install -y \
+    coreutils curl xz-utils \
+    erlang erlang-asn1 erlang-crypto erlang-eldap erlang-inets erlang-mnesia \
+    erlang-os-mon erlang-public-key erlang-ssl erlang-syntax-tools erlang-xmerl && \
   curl -sL -o /tmp/rabbitmq-server-generic-unix-${RABBITMQ_VERSION}.tar.gz https://www.rabbitmq.com/releases/rabbitmq-server/v${RABBITMQ_VERSION}/rabbitmq-server-generic-unix-${RABBITMQ_VERSION}.tar.xz && \
   cd /usr/lib/ && \
   tar xf /tmp/rabbitmq-server-generic-unix-${RABBITMQ_VERSION}.tar.gz && \
   rm /tmp/rabbitmq-server-generic-unix-${RABBITMQ_VERSION}.tar.gz && \
   mv /usr/lib/rabbitmq_server-${RABBITMQ_VERSION} /usr/lib/rabbitmq && \
   curl -sL -o /usr/lib/rabbitmq/plugins/autocluster-${AUTOCLUSTER_VERSION}.ez https://github.com/rabbitmq/rabbitmq-autocluster/releases/download/${AUTOCLUSTER_VERSION}/autocluster-${AUTOCLUSTER_VERSION}.ez && \
-  curl -sL -o /usr/lib/rabbitmq/plugins/rabbitmq_aws-${AUTOCLUSTER_VERSION}.ez https://github.com/rabbitmq/rabbitmq-autocluster/releases/download/${AUTOCLUSTER_VERSION}/rabbitmq_aws-${AUTOCLUSTER_VERSION}.ez && \
-  apk --purge del curl tar gzip xz
+curl -sL -o /usr/lib/rabbitmq/plugins/rabbitmq_aws-${AUTOCLUSTER_VERSION}.ez https://github.com/rabbitmq/rabbitmq-autocluster/releases/download/${AUTOCLUSTER_VERSION}/rabbitmq_aws-${AUTOCLUSTER_VERSION}.ez
 
 COPY root/ /
 
 # Fetch the external plugins and setup RabbitMQ
 RUN \
-  adduser -D -u 1000 -h $HOME rabbitmq rabbitmq && \
+  useradd -U -u 1001 -d $HOME rabbitmq && \
   cp /var/lib/rabbitmq/.erlang.cookie /root/ && \
   chown rabbitmq /var/lib/rabbitmq/.erlang.cookie && \
   chmod 0600 /var/lib/rabbitmq/.erlang.cookie /root/.erlang.cookie && \
