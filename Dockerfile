@@ -38,6 +38,8 @@ RUN \
   chown rabbitmq /var/lib/rabbitmq/.erlang.cookie && \
   chmod 0600 /var/lib/rabbitmq/.erlang.cookie /root/.erlang.cookie && \
   mkdir -p -m755 /var/log/rabbitmq && chown rabbitmq /var/log/rabbitmq && \
+  rm -rf /usr/lib/erlang/lib/inets-6.4.5/examples && \
+  rm -rf /usr/lib/erlang/lib/ssl-8.2.3/examples && \
   chown -R rabbitmq /usr/lib/rabbitmq /var/lib/rabbitmq && sync && \
   /usr/lib/rabbitmq/sbin/rabbitmq-plugins --offline enable \
     rabbitmq_management \
