@@ -51,6 +51,7 @@ RUN \
     autocluster
 
 VOLUME $HOME
+USER rabbitmq
 EXPOSE 4369 5671 5672 15672 25672
 ENTRYPOINT ["/launch.sh"]
 CMD ["rabbitmq-server"]
