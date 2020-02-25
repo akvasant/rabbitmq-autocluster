@@ -33,10 +33,11 @@ COPY root/ /
 
 # Fetch the external plugins and setup RabbitMQ
 RUN \
-  useradd -U -u 1001 -d $HOME rabbitmq && \
+  useradd -U -u 1001 -d $HOME -s /bin/bash rabbitmq && \
   cp /var/lib/rabbitmq/.erlang.cookie /root/ && \
   chown rabbitmq /var/lib/rabbitmq/.erlang.cookie && \
   chmod 0600 /var/lib/rabbitmq/.erlang.cookie /root/.erlang.cookie && \
+  mkdir -p -m755 /var/log/rabbitmq && chown rabbitmq /var/log/rabbitmq && \
   chown -R rabbitmq /usr/lib/rabbitmq /var/lib/rabbitmq && sync && \
   /usr/lib/rabbitmq/sbin/rabbitmq-plugins --offline enable \
     rabbitmq_management \
