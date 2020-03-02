@@ -22,6 +22,7 @@ RUN \
     coreutils curl xz-utils \
     erlang erlang-asn1 erlang-crypto erlang-eldap erlang-inets erlang-mnesia \
     erlang-os-mon erlang-public-key erlang-ssl erlang-syntax-tools erlang-xmerl && \
+    apt-get remove -y libapparmor1 xdg-user-dirs && \
     apt-get upgrade -y && \
   curl -sL -o /tmp/rabbitmq-server-generic-unix-${RABBITMQ_VERSION}.tar.gz https://www.rabbitmq.com/releases/rabbitmq-server/v${RABBITMQ_VERSION}/rabbitmq-server-generic-unix-${RABBITMQ_VERSION}.tar.xz && \
   cd /usr/lib/ && \
